@@ -54,6 +54,7 @@
         <div class="hero-actions reveal">
           <a href="#curriculum" class="btn btn-primary">查看课程体系</a>
           <a href="#videos" class="btn btn-ghost">▶ 观看纪实影像</a>
+          <a href="#companies" class="btn btn-ghost">首期回顾</a>
         </div>
       </div>
       <div class="hero-poster reveal">
@@ -287,8 +288,8 @@
     </div>
   </section>
 
-  <!-- ===== 纪实照片 ===== -->
-  <section class="section" id="gallery">
+  <!-- ===== 纪实照片：左右滚动播放 ===== -->
+  <section class="section section-gallery" id="gallery">
     <div class="container">
       <div class="section-head reveal">
         <p class="section-eyebrow">GALLERY · 纪实照片</p>
@@ -297,9 +298,17 @@
       <p class="section-lead reveal">
         开营、课堂、思辨、合影——每一个瞬间，都是共同求索的珍贵纪实。
       </p>
-      <div class="gallery-grid" id="galleryGrid">
-        <!-- 由 js/gallery-data.js + main.js 动态渲染，懒加载 -->
-      </div>
+    </div>
+
+    <!-- 横向滚动照片墙：由 js/gallery-data.js + js/photo-dims.js + main.js 渲染 -->
+    <div class="photo-marquee" id="photoMarquee" role="region" aria-label="实训营纪实照片，自动横向滚动"></div>
+
+    <div class="container">
+      <p class="marquee-hint reveal">
+        <span class="marquee-dot"></span>
+        照片左右自动滚动 · 轻触任意一张可放大浏览
+        <span class="marquee-count" id="photoCount"></span>
+      </p>
     </div>
   </section>
 
@@ -389,13 +398,13 @@
       <div class="contact-cards reveal">
         <div class="contact-card">
           <div class="contact-icon">📞</div>
-          <h3>咨询电话</h3>
-          <p class="contact-value">（待补充）</p>
+          <h3>咨询电话（微信）</h3>
+          <p class="contact-value"><a href="tel:15330225129">15330225129</a></p>
         </div>
         <div class="contact-card">
           <div class="contact-icon">💬</div>
           <h3>微信咨询</h3>
-          <p class="contact-value">（待补充）</p>
+          <p class="contact-value">15330225129（同电话）</p>
         </div>
         <div class="contact-card">
           <div class="contact-icon">📧</div>
@@ -403,7 +412,7 @@
           <p class="contact-value">（待补充）</p>
         </div>
       </div>
-      <p class="contact-note reveal">把页面中的「待补充」替换为真实联系方式后即可对外发布。</p>
+      <p class="contact-note reveal">欢迎来电或添加微信咨询下一期课程安排，邮箱正在补充中。</p>
     </div>
   </section>
 
@@ -412,6 +421,7 @@
     <div class="container footer-inner">
       <p class="footer-brand">企业家AI转型私董会暨实训营</p>
       <p class="footer-line">认知破局 · 框架搭建 · 方案出征</p>
+      <p class="footer-line">咨询电话（微信）：<a href="tel:15330225129">15330225129</a></p>
       <p class="footer-copy">© 2026 企业家AI转型私董会暨实训营 · 保留所有权利</p>
     </div>
   </footer>
@@ -444,6 +454,7 @@
   </div>
 
   <script src="js/gallery-data.js"></script>
+  <script src="js/photo-dims.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

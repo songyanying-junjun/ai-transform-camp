@@ -585,44 +585,111 @@ a { color: inherit; text-decoration: none; }
 }
 .team-desc { font-size: 14px; color: var(--text-dim); }
 
-/* ---------- 纪实照片 ---------- */
-.gallery-grid {
-  columns: 4 260px;
-  column-gap: 16px;
+/* ---------- 纪实照片：左右滚动墙 ---------- */
+.section-gallery { overflow: hidden; }
+
+.photo-marquee {
+  --row-h: 212px;
+  --gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  margin-top: 10px;
+  /* 左右边缘渐隐，照片淡入淡出而不是硬切 */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
 }
-.gallery-item {
+.marquee-row { overflow: hidden; }
+.marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+.marquee-row[data-dir="left"]  .marquee-track { animation: marquee-left linear infinite; }
+.marquee-row[data-dir="right"] .marquee-track { animation: marquee-right linear infinite; }
+
+@keyframes marquee-left {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+@keyframes marquee-right {
+  from { transform: translate3d(-50%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
+}
+
+/* 触摸或悬停时暂停，方便看清与点开 */
+.photo-marquee.is-paused .marquee-track { animation-play-state: paused; }
+
+.marquee-item {
   position: relative;
-  margin-bottom: 16px;
-  border-radius: 14px;
+  flex: 0 0 auto;
+  height: var(--row-h);
+  aspect-ratio: var(--ar, 4 / 3);
+  /* 用 margin 而非 flex gap：保证轨道 -50% 位移正好等于一组宽度，接缝无跳动 */
+  margin-right: var(--gap);
+  border-radius: 12px;
   overflow: hidden;
-  break-inside: avoid;
   cursor: zoom-in;
   border: 1px solid var(--line);
-  background: var(--bg-card);
+  background: linear-gradient(135deg, rgba(77, 214, 255, 0.10), rgba(139, 92, 246, 0.12));
   transition: transform .3s, box-shadow .3s, border-color .3s;
 }
-.gallery-item:hover {
-  transform: translateY(-4px) scale(1.015);
-  border-color: var(--line-strong);
-  box-shadow: 0 14px 40px rgba(124, 58, 237, 0.35);
-}
-.gallery-item img {
+.marquee-item img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   opacity: 0;
-  transition: opacity .5s;
+  transition: opacity .55s ease;
 }
-.gallery-item img.loaded { opacity: 1; }
-.gallery-item::after {
+.marquee-item img.loaded { opacity: 1; }
+.marquee-item::after {
   content: "";
   position: absolute; inset: 0;
-  background: linear-gradient(160deg, rgba(77, 214, 255, 0.0), rgba(139, 92, 246, 0.18));
+  background: linear-gradient(160deg, rgba(77, 214, 255, 0), rgba(139, 92, 246, 0.22));
   opacity: 0;
   transition: opacity .3s;
   pointer-events: none;
 }
-.gallery-item:hover::after { opacity: 1; }
+@media (hover: hover) {
+  .marquee-item:hover {
+    transform: scale(1.045);
+    border-color: var(--line-strong);
+    box-shadow: 0 12px 34px rgba(124, 58, 237, 0.42);
+    z-index: 2;
+  }
+  .marquee-item:hover::after { opacity: 1; }
+}
+
+.marquee-hint {
+  margin-top: 26px;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--text-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.marquee-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px rgba(77, 214, 255, 0.9);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: .45; transform: scale(.72); }
+}
+.marquee-count { color: var(--purple-bright); font-weight: 700; }
+
+/* 尊重「减弱动态效果」偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none !important; }
+  .marquee-dot { animation: none; }
+}
 
 /* 灯箱 */
 .lightbox {
@@ -943,4 +1010,91 @@ a { color: inherit; text-decoration: none; }
   .professor-card { flex-direction: column; align-items: center; text-align: center; padding: 32px 24px; }
   .professor-list { grid-template-columns: 1fr; text-align: left; }
   .professor-photo-wrap { width: 180px; height: 225px; }
+}
+
+/* ============================================================
+   手机端适配：间距、字号、触控手感
+   ============================================================ */
+
+/* 锚点跳转时给固定导航留出高度，标题不会被压住 */
+.section, #top { scroll-margin-top: 76px; }
+
+/* 触屏设备：去掉灰色点击高亮，改成按压回弹 */
+@media (hover: none) {
+  * { -webkit-tap-highlight-color: transparent; }
+  .btn:active { transform: scale(.97); }
+  .marquee-item:active { transform: scale(.97); }
+  .feature-card:active,
+  .unit-card:active,
+  .team-card:active,
+  .video-card:active,
+  .company-tag:active { transform: scale(.985); }
+}
+
+@media (max-width: 900px) {
+  .section { padding: 72px 0; }
+  .container { padding: 0 18px; }
+
+  /* 首屏：不再强制满屏高，避免手机地址栏收缩造成跳动 */
+  .hero { min-height: auto; padding: 100px 0 64px; }
+  .hero-title { font-size: clamp(27px, 8.4vw, 40px); letter-spacing: 1px; }
+  .hero-sub { font-size: 15px; margin-bottom: 24px; }
+  .hero-eyebrow {
+    font-size: 12.5px; letter-spacing: 2.5px;
+    padding: 5px 16px; margin-bottom: 20px;
+  }
+  .hero-meta { gap: 9px; margin-bottom: 26px; }
+  .meta-chip { font-size: 13px; padding: 7px 15px; }
+  .hero-actions { gap: 12px; }
+  .btn { padding: 14px 28px; font-size: 15.5px; }
+  .hero-scroll-hint { display: none; }  /* 小屏省掉，免得和按钮挤在一起 */
+  .poster-frame { width: min(280px, 72vw); }
+
+  .section-head { margin-bottom: 18px; }
+  .section-title { font-size: clamp(23px, 6.2vw, 30px); }
+  .section-lead { font-size: 14.5px; margin-bottom: 34px; }
+
+  /* 照片滚动墙：小屏用更矮的行高，视野更舒服 */
+  .photo-marquee { --row-h: 146px; --gap: 11px; }
+  .marquee-hint { margin-top: 20px; font-size: 12.5px; }
+
+  .feature-grid, .unit-grid { gap: 16px; }
+  .feature-card, .unit-card { padding: 24px 20px; }
+  .feature-icon { font-size: 30px; margin-bottom: 12px; }
+  .unit-card h3 { font-size: 21px; }
+
+  .video-grid { grid-template-columns: 1fr; gap: 20px; }
+  .video-card { padding: 16px; }
+  .video-frame-portrait { max-width: 250px; }
+
+  .company-grid { gap: 10px; }
+  .company-tag { font-size: 13.5px; padding: 9px 18px; }
+
+  .contact-cards { gap: 14px; margin-bottom: 22px; }
+  .contact-card { padding: 26px 20px; }
+  .contact-value { font-size: 15.5px; }
+
+  .site-footer { padding: 34px 0 calc(34px + env(safe-area-inset-bottom)); }
+  .footer-line { letter-spacing: 2px; }
+}
+
+@media (max-width: 420px) {
+  .container { padding: 0 16px; }
+  .photo-marquee { --row-h: 132px; }
+  .hero-title { font-size: clamp(25px, 8.8vw, 34px); }
+  .hero-actions .btn { flex: 1 1 auto; text-align: center; }
+}
+
+/* 灯箱：小屏放大触控区、给图片让出空间 */
+@media (max-width: 900px) {
+  .lb-img { max-width: 94vw; max-height: 74vh; }
+  .lb-close, .lb-prev, .lb-next {
+    width: 42px; height: 42px;
+    font-size: 19px;
+    background: rgba(26, 22, 58, 0.82);
+  }
+  .lb-close { top: 14px; right: 14px; }
+  .lb-prev { left: 6px; }
+  .lb-next { right: 6px; }
+  .lb-counter { bottom: calc(18px + env(safe-area-inset-bottom)); font-size: 13px; }
 }
